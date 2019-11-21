@@ -1,22 +1,32 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <string.h>
+
+typedef struct tweeter {
+	char* tweeter;
+	int count;
+} tweet;
 
 int main(int argc, char** argv)
 {
 	if (argc != 2 || argv[0] == NULL || argv[1] == NULL) {
 		perror("invalid input\n");
-		exit(-1);
+		return -1;
 	}
 
-	fd = open(argv[1], O_RDONLY);
-	if (fd == -1) {
-		perror("file open failure\n");
-		exit(errno);
+	FILE* fd = fopen(argv[1], "r");
+	if (fd == NULL) {
+		fprintf(stderr, "%s: %s\n", argv[1], strerror(errno));
+		return -1;
 	}
 
-	if (close(fd) == -1) {
-		perror("file close failure\n");
-		exit(errno);
+	if (fclose(fd) != 0) {
+		fprintf(stderr, "file close failure: %s\n", strerror(errno));
+		return -1;
 	}
+
+	return 0;
 }
