@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
+#include <ctype.h>
 #include <fcntl.h>
 #include <string.h>
 #include <stdbool.h>
@@ -9,6 +10,7 @@
 
 #define MAX_CHAR_PER_LINE 1024
 #define MAX_LINES_PER_FILE 20000
+#define min(a, b) (a < b ? a : b)
 
 typedef struct tweet {
 	char* tweeter;
@@ -28,10 +30,22 @@ void sort(tweet array[], int n)
 	}
 }
 
+//	TODO Should NOT trim:
+//				`nam e` to `name`
+//				`" name"` to `name`
+void trim(char *str)
+{
+	int count = 0;
+	for (int i = 0; str[i]; i++)
+		if (!isspace(str[i]) && str[i] != '\"')
+			str[count++] = str[i];
+	str[count] = '\0';
+}
+
 int main(int argc, char** argv)
 {
 	if (argc != 2 || argv[0] == NULL || argv[1] == NULL) {
-		perror("invalid input\n");
+		fprintf(stderr, "Invalid input format\n");
 		return -1;
 	}
 
@@ -51,16 +65,14 @@ int main(int argc, char** argv)
 		int num_cols = 0;
 		num_lines++;
 		while ((token = strsep(&tmp, ",")) != NULL) {
+			trim(token);
 			num_cols++;
-			if (num_lines == 1) {
-				if (!strcmp(token, "name") || !strcmp(token, "\"name\""))
-					tweeter_col = num_cols;
-			} else if (num_cols == tweeter_col) {
-				if (tweeter_col == -1) {
-					perror("Columnn not found: `name`");
-					return -1;
-				} else if (strlen(token) == 0)
-					continue;
+			if (num_lines == 1 && !strcmp(token, "name")) {
+				tweeter_col = num_cols;
+			} else if (num_lines > 1 && tweeter_col == -1) {
+				fprintf(stderr, "Invalid input format\n\tColumnn not found: `name`\n");
+				return -1;
+			} else if (num_cols == tweeter_col && strlen(token) > 0) {
 				int found_index = -1;
 				for (int i = 0; i < unique_tweet_count; i ++) {
 					if (!strcmp(tweets[i].tweeter, token)) {
