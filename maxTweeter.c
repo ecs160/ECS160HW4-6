@@ -49,11 +49,18 @@ int main(int argc, char** argv)
 		char* token;
 		char* tmp = strdup(line);
 		int num_cols = 0;
+		num_lines++;
 		while ((token = strsep(&tmp, ",")) != NULL) {
-			if (num_lines == 0) {
+			num_cols++;
+			if (num_lines == 1) {
 				if (!strcmp(token, "name") || !strcmp(token, "\"name\""))
 					tweeter_col = num_cols;
 			} else if (num_cols == tweeter_col) {
+				if (tweeter_col == -1) {
+					perror("Columnn not found: `name`");
+					return -1;
+				} else if (strlen(token) == 0)
+					continue;
 				int found_index = -1;
 				for (int i = 0; i < unique_tweet_count; i ++) {
 					if (!strcmp(tweets[i].tweeter, token)) {
@@ -68,9 +75,7 @@ int main(int argc, char** argv)
 				} else
 					tweets[found_index].count++;
 			}
-			num_cols++;
 		}
-		num_lines++;
 	}
 
 	sort(tweets, unique_tweet_count);
