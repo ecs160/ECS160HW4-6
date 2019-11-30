@@ -89,9 +89,8 @@ int main(int argc, char** argv)
 			}
 		}
 	}
-
 	sort(tweets, unique_tweet_count);
-	for (int i = 0; i < unique_tweet_count; i++)
+	for (int i = 0; i < min(unique_tweet_count, 10); i++)
 		printf("%s:\t%d\n", tweets[i].tweeter, tweets[i].count);
 
 	if (fclose(fd) != 0) {
