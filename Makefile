@@ -14,7 +14,6 @@ maxTweeter: $(objects)
 
 #Generate objects files from C files
 maxTweeter.o: maxTweeter.c 
-	@echo "CC $@"
 	$(Q) $(CC) $(CFLAGS) -c -o $@ $< 
 
 	
