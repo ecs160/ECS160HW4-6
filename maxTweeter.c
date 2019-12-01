@@ -6,11 +6,14 @@
 #include <fcntl.h>
 #include <string.h>
 #include <stdbool.h>
-#include <stdbool.h>
+
 
 #define MAX_CHAR_PER_LINE 1024
 #define MAX_LINES_PER_FILE 20000
 #define min(a, b) (a < b ? a : b)
+
+bool isNameFound = false;
+char *tokenContainsComma;
 
 typedef struct tweet {
 	char* tweeter;
@@ -65,6 +68,7 @@ int main(int argc, char** argv)
 		int num_cols = 0;
 		num_lines++;
 		while ((token = strsep(&tmp, ",")) != NULL) {
+
 			trim(token);
 			num_cols++;
 			if (num_lines == 1 && !strcmp(token, "name")) {
@@ -73,6 +77,20 @@ int main(int argc, char** argv)
 				fprintf(stderr, "Invalid input format\n\tColumnn not found: `name`\n");
 				return -1;
 			} else if (num_cols == tweeter_col && strlen(token) > 0) {
+			// tokenContainsComma = strchr(token, '.');
+			// if (tokenContainsComma){
+			// 	fprintf(stderr, "Token contains a comma, invalid input\n");
+			// 	return -1;
+			// }
+
+			if (num_lines == 0) {
+				if (!strcmp(token, "name") || !strcmp(token, "\"name\"")){
+					tweeter_col = num_cols;
+					isNameFound = true;
+				}
+					
+			} else if (num_cols == tweeter_col) {
+
 				int found_index = -1;
 				for (int i = 0; i < unique_tweet_count; i ++) {
 					if (!strcmp(tweets[i].tweeter, token)) {
@@ -89,6 +107,12 @@ int main(int argc, char** argv)
 			}
 		}
 	}
+
+	if (!isNameFound){
+		fprintf(stderr, "name was not found in header\n");
+		return -1;
+	}
+
 	sort(tweets, unique_tweet_count);
 	for (int i = 0; i < min(unique_tweet_count, 10); i++)
 		printf("%s:\t%d\n", tweets[i].tweeter, tweets[i].count);
