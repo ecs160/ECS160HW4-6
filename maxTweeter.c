@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 			} else if (num_lines > 1 && tweeter_col == -1) {
 				fprintf(stderr, "Invalid input format\n\tHeader not found: `name`\n");
 				return -1;
-			} else if (num_cols == tweeter_col) {
+			} else if (num_cols == tweeter_col && strlen(token) > 0) {
 				int found_index = -1;
 				for (int i = 0; i < unique_tweet_count; i ++) {
 					if (!strcmp(tweets[i].tweeter, token)) {
