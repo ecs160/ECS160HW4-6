@@ -27,7 +27,6 @@ do {							\
 #define min(a, b) (a < b ? a : b)
 
 bool isNameFound = false;
-//char *tokenContainsComma;
 
 typedef struct tweet {
 	char* tweeter;
@@ -57,7 +56,7 @@ void trim(char *str)
 {
 	int count = 0;
 	for (int i = 0; str[i]; i++)
-		if (!isspace(str[i]) && str[i] != '\"')
+		if (!isspace(str[i]))
 			str[count++] = str[i];
 	str[count] = '\0';
 }
@@ -143,8 +142,7 @@ int main(int argc, char** argv)
 					tweets[tweet_index].count++;
 			}
 		}
-
-			num_lines++;
+		num_lines++;
 	}
 
 	sort(tweets, unique_tw_count);
