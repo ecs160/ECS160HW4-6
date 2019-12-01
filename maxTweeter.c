@@ -13,7 +13,7 @@
 #define min(a, b) (a < b ? a : b)
 
 bool isNameFound = false;
-char *tokenContainsComma;
+//char *tokenContainsComma;
 
 typedef struct tweet {
 	char* tweeter;
@@ -71,24 +71,14 @@ int main(int argc, char** argv)
 
 			trim(token);
 			num_cols++;
-			if (num_lines == 1 && !strcmp(token, "name")) {
-				tweeter_col = num_cols;
-			} else if (num_lines > 1 && tweeter_col == -1) {
-				fprintf(stderr, "Invalid input format\n\tColumnn not found: `name`\n");
-				return -1;
-			} else if (num_cols == tweeter_col && strlen(token) > 0) {
-			// tokenContainsComma = strchr(token, '.');
-			// if (tokenContainsComma){
-			// 	fprintf(stderr, "Token contains a comma, invalid input\n");
-			// 	return -1;
-			// }
+
 
 			if (num_lines == 0) {
 				if (!strcmp(token, "name") || !strcmp(token, "\"name\"")){
 					tweeter_col = num_cols;
 					isNameFound = true;
 				}
-					
+
 			} else if (num_cols == tweeter_col) {
 
 				int found_index = -1;
