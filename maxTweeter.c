@@ -7,6 +7,20 @@
 #include <string.h>
 #include <stdbool.h>
 
+#define tw_error(fmt, ...) 		\
+	fprintf(stderr, "%s: "fmt"\n", __func__, ##__VA_ARGS__)
+
+#define die(...)				\
+do {							\
+	tw_error(__VA_ARGS__);		\
+	exit(1);					\
+} while (0)
+
+#define die_perror(msg)			\
+do {							\
+	perror(msg);				\
+	exit(1);					\
+} while (0)
 
 #define MAX_CHAR_PER_LINE 1024
 #define MAX_LINES_PER_FILE 20000
@@ -30,6 +44,12 @@ void sort(tweet array[], int n)
 	}
 }
 
+void print(tweet tweets[], int n)
+{
+	for (int i = 0; i < n; i++)
+		printf("%s:\t%d\n", tweets[i].tweeter, tweets[i].count);
+}
+
 void trim(char *str)
 {
 	int count = 0;
@@ -39,63 +59,94 @@ void trim(char *str)
 	str[count] = '\0';
 }
 
-int main(int argc, char** argv)
+bool surrounded_by(char* str, char c)
 {
-	if (argc != 2 || argv[0] == NULL || argv[1] == NULL) {
-		fprintf(stderr, "Invalid input format\n");
-		return -1;
+	return str[0] == c || str[strlen(str) - 1] == c;
+}
+
+bool not_surrounded_by(char* str, char c)
+{
+	return str[0] != c || str[strlen(str) - 1] != c;
+}
+
+bool header_exists(char* headers[], char* str, int n)
+{
+	for (int i = 0; i < n; i++) {
+		if (!strcmp(headers[i], str))
+			return true;
 	}
+	return false;
+}
+
+int find_index(tweet tweets[], char* str, int n)
+{
+	for (int i = 0; i < n; i++) {
+		if (!strcmp(tweets[i].tweeter, str))
+			return i;
+	}
+	return -1;
+}
+
+FILE* get_fd(int argc, char** argv)
+{
+	if (argc != 2 || argv[0] == NULL || argv[1] == NULL)
+		die("Invalid input format");
 
 	FILE* fd = fopen(argv[1], "r");
-	if (fd == NULL) {
-		fprintf(stderr, "%s: %s\n", argv[1], strerror(errno));
-		return -1;
-	}
+	if (fd == NULL)
+		die_perror(argv[1]);
+	return fd;
+}
 
-	char line[MAX_CHAR_PER_LINE];
-	int unique_tweet_count = 0, num_lines = 0, tweeter_col = -1;
+int main(int argc, char** argv)
+{
+	FILE* fd = get_fd(argc, argv);
 	tweet tweets[MAX_LINES_PER_FILE];
+	char* headers[MAX_CHAR_PER_LINE];
+	char line[MAX_CHAR_PER_LINE];
+	int unique_tw_count = 0, unique_header_count = 0;
+	int num_lines = 0, tweeter_col = -1;
 
 	while (fgets(line, MAX_CHAR_PER_LINE, fd)) {
 		char* token;
 		char* tmp = strdup(line);
 		int num_cols = 0;
+		bool header_quotes = false;
 		num_lines++;
 		while ((token = strsep(&tmp, ",")) != NULL) {
 			num_cols++;
-			if (num_lines == 1) {
+			if (num_lines == 1 && strlen(token) > 0 && strcmp(token, "\n")) {
 				trim(token);
+				if (!header_quotes && surrounded_by(token, '"'))
+					header_quotes = true;
+				if (header_quotes && not_surrounded_by(token, '"'))
+					die("Inconsistent header quotes");
+
+				if (header_exists(headers, token, unique_header_count))
+					die("Invalid Duplicate Header");
+				else
+					headers[unique_header_count++] = token;
+
 				if (!strcmp(token, "name") || !strcmp(token, "\"name\""))
 					tweeter_col = num_cols;
-			} else if (num_lines > 1 && tweeter_col == -1) {
-				fprintf(stderr, "Invalid input format\n\tHeader not found: `name`\n");
-				return -1;
-			} else if (num_cols == tweeter_col && strlen(token) > 0) {
-				int found_index = -1;
-				for (int i = 0; i < unique_tweet_count; i ++) {
-					if (!strcmp(tweets[i].tweeter, token)) {
-						found_index = i;
-						break;
-					}
-				}
-				if (found_index == -1) {
-					tweets[unique_tweet_count].tweeter = token;
-					tweets[unique_tweet_count].count = 1;
-					unique_tweet_count++;
+			} else if (num_lines > 1 && tweeter_col == -1)
+				die("Header not found: `name`");
+			else if (num_cols == tweeter_col && strlen(token) > 0) {
+				int tweet_index = find_index(tweets, token, unique_tw_count);
+				if (tweet_index == -1) {
+					tweets[unique_tw_count].tweeter = token;
+					tweets[unique_tw_count++].count = 1;
 				} else
-					tweets[found_index].count++;
+					tweets[tweet_index].count++;
 			}
 		}
 	}
 
-	sort(tweets, unique_tweet_count);
-	for (int i = 0; i < min(unique_tweet_count, 10); i++)
-		printf("%s:\t%d\n", tweets[i].tweeter, tweets[i].count);
+	sort(tweets, unique_tw_count);
+	print(tweets, min(unique_tw_count, 10));
 
-	if (fclose(fd) != 0) {
-		fprintf(stderr, "file close failure: %s\n", strerror(errno));
-		return -1;
-	}
+	if (fclose(fd) != 0)
+		die_perror(argv[1]);
 
 	return 0;
 }
