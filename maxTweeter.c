@@ -62,9 +62,9 @@ int main(int argc, char** argv)
 		int num_cols = 0;
 		num_lines++;
 		while ((token = strsep(&tmp, ",")) != NULL) {
-			trim(token);
 			num_cols++;
 			if (num_lines == 1) {
+				trim(token);
 				if (!strcmp(token, "name") || !strcmp(token, "\"name\""))
 					tweeter_col = num_cols;
 			} else if (num_lines > 1 && tweeter_col == -1) {
