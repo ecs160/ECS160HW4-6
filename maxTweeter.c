@@ -50,6 +50,16 @@ void print(tweet tweets[], int n)
 		printf("%s:\t%d\n", tweets[i].tweeter, tweets[i].count);
 }
 
+bool is_empty(const char *s)
+{
+	while (*s != '\0') {
+		if (!isspace((unsigned char)*s))
+			return false;
+		s++;
+	}
+	return true;
+}
+
 char *trim(char *str)
 {
 	char *end;
@@ -124,6 +134,8 @@ int main(int argc, char** argv)
 		char* tmp = strdup(line);
 		num_cols = 0;
 		num_lines++;
+		if (is_empty(tmp))
+			die("Empty line");
 		while ((token = strsep(&tmp, ",")) != NULL) {
 			num_cols++;
 			if (num_lines == 1 && strlen(token) > 0 && strcmp(token, "\n")) {
