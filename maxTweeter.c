@@ -50,13 +50,24 @@ void print(tweet tweets[], int n)
 		printf("%s:\t%d\n", tweets[i].tweeter, tweets[i].count);
 }
 
-void trim(char *str)
+char *trim(char *str)
 {
-	int count = 0;
-	for (int i = 0; str[i]; i++)
-		if (!isspace(str[i]))
-			str[count++] = str[i];
-	str[count] = '\0';
+	char *end;
+	// Trim leading space
+	while (isspace((unsigned char)*str)
+	       || (unsigned char)*str == '"') str++;
+
+	if (*str == 0) // All spaces?
+		return str;
+
+	// Trim trailing space
+	end = str + strlen(str) - 1;
+	while (end > str && (isspace((unsigned char)*end)
+	                     || (unsigned char)*end == '"')) end--;
+
+	end[1] = '\0';
+
+	return str;
 }
 
 bool surrounded_by(char* str, char c)
@@ -116,7 +127,7 @@ int main(int argc, char** argv)
 		while ((token = strsep(&tmp, ",")) != NULL) {
 			num_cols++;
 			if (num_lines == 1 && strlen(token) > 0 && strcmp(token, "\n")) {
-				trim(token);
+				token = trim(token);
 				if (!header_quotes && surrounded_by(token, '"'))
 					header_quotes = true;
 				if (header_quotes && not_surrounded_by(token, '"'))
@@ -127,7 +138,7 @@ int main(int argc, char** argv)
 				else
 					headers[unique_header_count++] = token;
 
-				if (!strcmp(token, "name") || !strcmp(token, "\"name\""))
+				if (!strcmp(token, "name"))
 					tweeter_col = num_cols;
 			} else if (num_lines > 1 && tweeter_col == -1)
 				die("Header not found: `name`");
