@@ -64,14 +64,14 @@ char *trim_quotes(char *str)
 {
 	char *end;
 	// Trim leading space
-	while ((unsigned char)*str == '"') str++;
+	if ((unsigned char)*str == '"') str++;
 
 	if (*str == 0) // All spaces?
 		return str;
 
 	// Trim trailing space
 	end = str + strlen(str) - 1;
-	while (end > str && (unsigned char)*end == '"') end--;
+	if (end > str && (unsigned char)*end == '"') end--;
 
 	end[1] = '\0';
 
@@ -150,6 +150,8 @@ int main(int argc, char** argv)
 		char* tmp = strdup(line);
 		num_cols = 0;
 		num_lines++;
+		if (is_empty(tmp))
+			continue;
 		while ((token = strsep(&tmp, ",")) != NULL) {
 			num_cols++;
 			token = trim_whitespace(token);
