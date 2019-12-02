@@ -80,12 +80,12 @@ char *trim_quotes(char *str)
 
 bool surrounded_by(char* str, char c)
 {
-	return str[0] == c || str[strlen(str) - 1] == c;
+	return str[0] == c && str[strlen(str) - 1] == c;
 }
 
 bool not_surrounded_by(char* str, char c)
 {
-	return str[0] != c || str[strlen(str) - 1] != c;
+	return str[0] != c && str[strlen(str) - 1] != c;
 }
 
 bool header_exists(char* headers[], char* str, int n)
@@ -158,7 +158,8 @@ int main(int argc, char** argv)
 				    || (!quotes[num_cols] && surrounded_by(token, '"')))
 					die("Inconsistent quotes");
 				if (num_cols == tweeter_col) {
-					token = trim_quotes(token);
+					if (quotes[num_cols])
+						token = trim_quotes(token);
 					int tweet_index = find_index(tweets, token, tw_count);
 					if (tweet_index == -1) {
 						tweets[tw_count].tweeter = token;
