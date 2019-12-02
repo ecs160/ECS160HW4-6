@@ -125,7 +125,7 @@ int main(int argc, char** argv)
 	tweet tweets[MAX_LINES_PER_FILE];
 	char* headers[MAX_CHAR_PER_LINE];
 	char line[MAX_CHAR_PER_LINE];
-	int unique_tw_count = 0, unique_header_count = 0;
+	int tw_count = 0, unique_header_count = 0;
 	int num_cols =  0, num_headers = 0, num_lines = 0, tweeter_col = -1;
 	bool header_quotes = false;
 
@@ -140,9 +140,10 @@ int main(int argc, char** argv)
 			num_cols++;
 			char* old_token = strdup(token);
 			token = trim(token);
-			if (num_lines == 1 && strlen(token) > 0 && strcmp(token, "\n")) {
+			if (num_lines == 1 && strlen(token) > 0 && !is_empty(token)) {
 				if (surrounded_by(old_token, '"'))
 					header_quotes = true;
+
 				if (header_exists(headers, token, unique_header_count))
 					die("Invalid Duplicate Header");
 				else
@@ -152,16 +153,17 @@ int main(int argc, char** argv)
 					tweeter_col = num_cols;
 			} else if (num_lines > 1 && tweeter_col == -1)
 				die("Header not found: `name`");
-			else if (num_cols == tweeter_col && strlen(token) > 0) {
+			else if (!is_empty(token)) {
 				if (header_quotes && not_surrounded_by(old_token, '"'))
 					die("Inconsistent header quotes");
-
-				int tweet_index = find_index(tweets, token, unique_tw_count);
-				if (tweet_index == -1) {
-					tweets[unique_tw_count].tweeter = token;
-					tweets[unique_tw_count++].count = 1;
-				} else
-					tweets[tweet_index].count++;
+				if (num_cols == tweeter_col) {
+					int tweet_index = find_index(tweets, token, tw_count);
+					if (tweet_index == -1) {
+						tweets[tw_count].tweeter = token;
+						tweets[tw_count++].count = 1;
+					} else
+						tweets[tweet_index].count++;
+				}
 			}
 		}
 		if (num_lines == 1)
@@ -170,8 +172,8 @@ int main(int argc, char** argv)
 			die("Inconsistent number of columns");
 	}
 
-	sort(tweets, unique_tw_count);
-	print(tweets, min(unique_tw_count, 10));
+	sort(tweets, tw_count);
+	print(tweets, min(tw_count, 10));
 
 	if (fclose(fd) != 0)
 		die_perror(argv[1]);
