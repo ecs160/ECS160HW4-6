@@ -50,6 +50,16 @@ void print(tweet tweets[], int n)
 		printf("%s:\t%d\n", tweets[i].tweeter, tweets[i].count);
 }
 
+bool is_empty(const char *s)
+{
+	while (*s != '\0') {
+		if (!isspace((unsigned char)*s))
+			return false;
+		s++;
+	}
+	return true;
+}
+
 char *trim(char *str)
 {
 	char *end;
@@ -124,15 +134,15 @@ int main(int argc, char** argv)
 		char* tmp = strdup(line);
 		num_cols = 0;
 		num_lines++;
+		if (is_empty(tmp))
+			die("Empty line");
 		while ((token = strsep(&tmp, ",")) != NULL) {
 			num_cols++;
+			char* old_token = strdup(token);
+			token = trim(token);
 			if (num_lines == 1 && strlen(token) > 0 && strcmp(token, "\n")) {
-				token = trim(token);
-				if (!header_quotes && surrounded_by(token, '"'))
+				if (surrounded_by(old_token, '"'))
 					header_quotes = true;
-				if (header_quotes && not_surrounded_by(token, '"'))
-					die("Inconsistent header quotes");
-
 				if (header_exists(headers, token, unique_header_count))
 					die("Invalid Duplicate Header");
 				else
@@ -143,6 +153,9 @@ int main(int argc, char** argv)
 			} else if (num_lines > 1 && tweeter_col == -1)
 				die("Header not found: `name`");
 			else if (num_cols == tweeter_col && strlen(token) > 0) {
+				if (header_quotes && not_surrounded_by(old_token, '"'))
+					die("Inconsistent header quotes");
+
 				int tweet_index = find_index(tweets, token, unique_tw_count);
 				if (tweet_index == -1) {
 					tweets[unique_tw_count].tweeter = token;
