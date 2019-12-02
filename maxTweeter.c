@@ -78,23 +78,6 @@ char *trim_quotes(char *str)
 	return str;
 }
 
-char *trim_whitespace(char *str)
-{
-	char *end;
-	// Trim leading space
-	while (isspace((unsigned char)*str)) str++;
-
-	if (*str == 0) // All spaces?
-		return str;
-
-	// Trim trailing space
-	end = str + strlen(str) - 1;
-	while (end > str && isspace((unsigned char)*end)) end--;
-
-	end[1] = '\0';
-
-	return str;
-}
 bool surrounded_by(char* str, char c)
 {
 	return str[0] == c || str[strlen(str) - 1] == c;
@@ -154,11 +137,9 @@ int main(int argc, char** argv)
 			continue;
 		while ((token = strsep(&tmp, ",")) != NULL) {
 			num_cols++;
-			token = trim_whitespace(token);
 			if (num_lines == 1 && strlen(token) > 0 && !is_empty(token)) {
 				if (surrounded_by(token, '"'))
 					quotes[num_cols] = true;
-
 				token = trim_quotes(token);
 
 				if (header_exists(headers, token, unique_header_count))
