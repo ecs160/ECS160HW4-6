@@ -1,6 +1,6 @@
 objects := maxTweeter.o
 
-CC := gcc
+CC := afl-clang
 CFLAGS := -Wall -Werror
 CFLAGS += -g 
 
