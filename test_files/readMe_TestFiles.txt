@@ -49,3 +49,4 @@ ex: "name"
 Change all the error messages to invalid Input before turning in 
 Run fuzz testing for at least an hour or two prior to turning in 
 REMOVE test_files from github repo prior to turning in 
+Make the repo public and share it like specifications
