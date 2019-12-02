@@ -28,7 +28,7 @@ maxTweeter test_spaces_before_after_quotation
 //DONE	1. Check for number of commas in each column to match the number of header commas	
 ---------------------------------------------------------------------------------------------------------------------------
 
-| TO DO |	
+//DONE	
 test_quoted_header_nonquoted_column_2, successful_case_1
 all have the same root problem of which is we need to check for quotation consistency of all the columns not just name column
 
@@ -45,8 +45,8 @@ ex: "name"
 ---------------------------------------------------------------------------------------------------------------------------
 //DONE 4. should check to see if name column exists in empty file before processing to next lines
 ---------------------------------------------------------------------------------------------------------------------------
-| TO DO |	
-Change all the error messages to invalid Input before turning in 
+//DONE 5. Change all the error messages to invalid Input before turning in 
+---------------------------------------------------------------------------------------------------------------------------
 Run fuzz testing for at least an hour or two prior to turning in 
 REMOVE test_files from github repo prior to turning in 
 Make the repo public and share it like specifications
