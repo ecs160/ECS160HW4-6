@@ -1,6 +1,6 @@
 Invalid cases
-maxTweeter test_char_before_quoted_column		
-maxTweeter test_name_inquotes       			
+maxTweeter test_char_before_quoted_column 		(now is invalid)		
+maxTweeter test_name_inquotes       			(throws an error for the wrong reason)		
 maxTweeter test_name_inQuotes  				
 maxTweeter test_header_quoted_duplicate
 maxTweeter test_missing_pair_quotations
@@ -11,10 +11,10 @@ maxTweeter test_comma_seperator_3
 maxTweeter test_duplicate_name_header  			
 maxTweeter test_quoted_header_nonquoted_column_2	
 maxTweeter testEmpty.csv                		
-maxTweeter test_quoted_header_spaced_column		(should print invalid, not supposed to trim white space if quotes are not on index 0 and last character)
+maxTweeter test_quoted_header_spaced_column		
 maxTweeter 'test_empty_quotes_header '
 maxTweeter test_empty_header_quoted_column
-maxTweeter test_name_quotations.csv			(supposed to throw an error, csv files by excel add "" around all fields, ""name"")
+maxTweeter test_name_quotations.csv			
 maxTweeter test_quoted_header_nonquoted_column
 
 ---------------------------------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ Valid cases
 maxTweeter successful_case_1 				
 maxTweeter test_nonquoted_header_oneQuote_midColumn
 maxTweeter maxTweet  
-maxTweeter test_spaces_before_after_quotation		(needs to be fixed because it's printing invalid)
+maxTweeter test_spaces_before_after_quotation		
 
 ---------------------------------------------------------------------------------------------------------------------------
 //DONE	1. Check for number of commas in each column to match the number of header commas	
