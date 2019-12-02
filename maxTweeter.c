@@ -50,13 +50,24 @@ void print(tweet tweets[], int n)
 		printf("%s:\t%d\n", tweets[i].tweeter, tweets[i].count);
 }
 
-void trim(char *str)
+char *trim(char *str)
 {
-	int count = 0;
-	for (int i = 0; str[i]; i++)
-		if (!isspace(str[i]))
-			str[count++] = str[i];
-	str[count] = '\0';
+	char *end;
+	// Trim leading space
+	while (isspace((unsigned char)*str)
+	       || (unsigned char)*str == '"') str++;
+
+	if (*str == 0) // All spaces?
+		return str;
+
+	// Trim trailing space
+	end = str + strlen(str) - 1;
+	while (end > str && (isspace((unsigned char)*end)
+	                     || (unsigned char)*end == '"')) end--;
+
+	end[1] = '\0';
+
+	return str;
 }
 
 bool surrounded_by(char* str, char c)
@@ -105,18 +116,18 @@ int main(int argc, char** argv)
 	char* headers[MAX_CHAR_PER_LINE];
 	char line[MAX_CHAR_PER_LINE];
 	int unique_tw_count = 0, unique_header_count = 0;
-	int num_lines = 0, tweeter_col = -1;
+	int num_cols =  0, num_headers = 0, num_lines = 0, tweeter_col = -1;
+	bool header_quotes = false;
 
 	while (fgets(line, MAX_CHAR_PER_LINE, fd)) {
 		char* token;
 		char* tmp = strdup(line);
-		int num_cols = 0;
-		bool header_quotes = false;
+		num_cols = 0;
 		num_lines++;
 		while ((token = strsep(&tmp, ",")) != NULL) {
 			num_cols++;
 			if (num_lines == 1 && strlen(token) > 0 && strcmp(token, "\n")) {
-				trim(token);
+				token = trim(token);
 				if (!header_quotes && surrounded_by(token, '"'))
 					header_quotes = true;
 				if (header_quotes && not_surrounded_by(token, '"'))
@@ -127,7 +138,7 @@ int main(int argc, char** argv)
 				else
 					headers[unique_header_count++] = token;
 
-				if (!strcmp(token, "name") || !strcmp(token, "\"name\""))
+				if (!strcmp(token, "name"))
 					tweeter_col = num_cols;
 			} else if (num_lines > 1 && tweeter_col == -1)
 				die("Header not found: `name`");
@@ -140,6 +151,10 @@ int main(int argc, char** argv)
 					tweets[tweet_index].count++;
 			}
 		}
+		if (num_lines == 1)
+			num_headers = num_cols;
+		else if (num_headers != num_cols)
+			die("Inconsistent number of columns");
 	}
 
 	sort(tweets, unique_tw_count);
