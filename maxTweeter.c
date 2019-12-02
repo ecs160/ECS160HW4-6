@@ -126,6 +126,7 @@ int main(int argc, char** argv)
 	char* headers[MAX_CHAR_PER_LINE];
 	bool quotes[MAX_CHAR_PER_LINE];
 	char line[MAX_CHAR_PER_LINE];
+	bool nameFound = false;
 	int tw_count = 0, unique_header_count = 0;
 	int num_cols = 0, num_headers = 0, num_lines = 0, tweeter_col = -1;
 
@@ -147,8 +148,10 @@ int main(int argc, char** argv)
 				else
 					headers[unique_header_count++] = token;
 
-				if (!strcmp(token, "name"))
+				if (!strcmp(token, "name")){
+					 nameFound = true;
 					tweeter_col = num_cols;
+				}
 			} else if (num_lines > 1 && tweeter_col == -1)
 				die("Header not found: `name`");
 			else if (!is_empty(token)) {
@@ -170,6 +173,8 @@ int main(int argc, char** argv)
 		else if (num_headers != num_cols)
 			die("Inconsistent number of columns");
 	}
+	if (!nameFound)
+		die("Header not found: `name`");
 
 	sort(tweets, tw_count);
 	print(tweets, min(tw_count, 10));
