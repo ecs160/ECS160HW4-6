@@ -105,13 +105,13 @@ int main(int argc, char** argv)
 	char* headers[MAX_CHAR_PER_LINE];
 	char line[MAX_CHAR_PER_LINE];
 	int unique_tw_count = 0, unique_header_count = 0;
-	int num_lines = 0, tweeter_col = -1;
+	int num_cols =  0, num_headers = 0, num_lines = 0, tweeter_col = -1;
+	bool header_quotes = false;
 
 	while (fgets(line, MAX_CHAR_PER_LINE, fd)) {
 		char* token;
 		char* tmp = strdup(line);
-		int num_cols = 0;
-		bool header_quotes = false;
+		num_cols = 0;
 		num_lines++;
 		while ((token = strsep(&tmp, ",")) != NULL) {
 			num_cols++;
@@ -140,6 +140,10 @@ int main(int argc, char** argv)
 					tweets[tweet_index].count++;
 			}
 		}
+		if (num_lines == 1)
+			num_headers = num_cols;
+		else if (num_headers != num_cols)
+			die("Inconsistent number of columns");
 	}
 
 	sort(tweets, unique_tw_count);
