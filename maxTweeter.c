@@ -47,7 +47,7 @@ void sort(tweet array[], int n)
 void print(tweet tweets[], int n)
 {
 	for (int i = 0; i < n; i++)
-		printf("%s:\t%d\n", tweets[i].tweeter, tweets[i].count);
+		printf("%s: %d\n", tweets[i].tweeter, tweets[i].count);
 }
 
 bool is_empty(const char *s)
@@ -109,7 +109,7 @@ int find_index(tweet tweets[], char* str, int n)
 FILE* get_fd(int argc, char** argv)
 {
 	if (argc != 2 || argv[0] == NULL || argv[1] == NULL)
-		die("Invalid input format");
+		die("Invalid Input");
 
 	FILE* fd = fopen(argv[1], "r");
 	if (fd == NULL)
@@ -143,7 +143,7 @@ int main(int argc, char** argv)
 				token = trim_quotes(token);
 
 				if (header_exists(headers, token, unique_header_count))
-					die("Invalid Duplicate Header");
+					die("Invalid Input");
 				else
 					headers[unique_header_count++] = token;
 
@@ -152,11 +152,11 @@ int main(int argc, char** argv)
 					tweeter_col = num_cols;
 				}
 			} else if (num_lines > 1 && tweeter_col == -1)
-				die("Header not found: `name`");
+				die("Invalid Input");
 			else if (!is_empty(token)) {
 				if ((quotes[num_cols] && not_surrounded_by(token, '"'))
 				    || (!quotes[num_cols] && surrounded_by(token, '"')))
-					die("Inconsistent quotes");
+					die("Invalid Input");
 				if (num_cols == tweeter_col) {
 					if (quotes[num_cols])
 						token = trim_quotes(token);
@@ -172,10 +172,10 @@ int main(int argc, char** argv)
 		if (num_lines == 1)
 			num_headers = num_cols;
 		else if (num_headers != num_cols)
-			die("Inconsistent number of columns");
+			die("Invalid Input");
 	}
 	if (!nameFound)
-		die("Header not found: `name`");
+		die("Invalid Input");
 
 	sort(tweets, tw_count);
 	print(tweets, min(tw_count, 10));
