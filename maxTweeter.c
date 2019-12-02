@@ -134,8 +134,6 @@ int main(int argc, char** argv)
 		char* tmp = strdup(line);
 		num_cols = 0;
 		num_lines++;
-		if (is_empty(tmp))
-			die("Empty line");
 		while ((token = strsep(&tmp, ",")) != NULL) {
 			num_cols++;
 			char* old_token = strdup(token);
