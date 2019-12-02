@@ -139,7 +139,7 @@ int main(int argc, char** argv)
 			num_cols++;
 			char* old_token = strdup(token);
 			token = trim(token);
-			if (num_lines == 1 && strlen(token) > 0 && !is_empty(token)) {
+			if (num_lines == 1 && strlen(old_token) > 0 && !is_empty(old_token)) {
 				if (surrounded_by(old_token, '"'))
 					quotes[num_cols] = true;
 
@@ -148,8 +148,8 @@ int main(int argc, char** argv)
 				else
 					headers[unique_header_count++] = token;
 
-				if (!strcmp(token, "name")){
-					 nameFound = true;
+				if (!strcmp(token, "name")) {
+					nameFound = true;
 					tweeter_col = num_cols;
 				}
 			} else if (num_lines > 1 && tweeter_col == -1)
