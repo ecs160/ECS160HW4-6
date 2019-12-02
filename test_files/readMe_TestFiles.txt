@@ -19,7 +19,7 @@ maxTweeter test_quoted_header_nonquoted_column
 
 ---------------------------------------------------------------------------------------------------------------------------
 Valid cases
-maxTweeter successful_case_1 				
+maxTweeter successful_case_1 				(needs to be fixed because it's printing invalid)
 maxTweeter test_nonquoted_header_oneQuote_midColumn
 maxTweeter maxTweet  
 maxTweeter test_spaces_before_after_quotation		(doesn't work anymore, needs to be fixed)
