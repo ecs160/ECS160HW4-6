@@ -29,7 +29,7 @@ maxTweeter test_spaces_before_after_quotation
 ---------------------------------------------------------------------------------------------------------------------------
 
 | TO DO |	
-test_quoted_header_nonquoted_column_2, successful_case_1, and test_spaces_before_after_quotation
+test_quoted_header_nonquoted_column_2, successful_case_1
 all have the same root problem of which is we need to check for quotation consistency of all the columns not just name column
 
 2. check for header consistency in columns. If a header starts with quotes at the beginning and
