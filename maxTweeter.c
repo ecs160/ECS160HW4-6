@@ -138,13 +138,11 @@ int main(int argc, char** argv)
 			die("Empty line");
 		while ((token = strsep(&tmp, ",")) != NULL) {
 			num_cols++;
+			char* old_token = strdup(token);
+			token = trim(token);
 			if (num_lines == 1 && strlen(token) > 0 && strcmp(token, "\n")) {
-				token = trim(token);
-				if (!header_quotes && surrounded_by(token, '"'))
+				if (surrounded_by(old_token, '"'))
 					header_quotes = true;
-				if (header_quotes && not_surrounded_by(token, '"'))
-					die("Inconsistent header quotes");
-
 				if (header_exists(headers, token, unique_header_count))
 					die("Invalid Duplicate Header");
 				else
@@ -155,6 +153,9 @@ int main(int argc, char** argv)
 			} else if (num_lines > 1 && tweeter_col == -1)
 				die("Header not found: `name`");
 			else if (num_cols == tweeter_col && strlen(token) > 0) {
+				if (header_quotes && not_surrounded_by(old_token, '"'))
+					die("Inconsistent header quotes");
+
 				int tweet_index = find_index(tweets, token, unique_tw_count);
 				if (tweet_index == -1) {
 					tweets[unique_tw_count].tweeter = token;
