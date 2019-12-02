@@ -60,26 +60,41 @@ bool is_empty(const char *s)
 	return true;
 }
 
-char *trim(char *str)
+char *trim_quotes(char *str)
 {
 	char *end;
 	// Trim leading space
-	while (isspace((unsigned char)*str)
-	       || (unsigned char)*str == '"') str++;
+	while ((unsigned char)*str == '"') str++;
 
 	if (*str == 0) // All spaces?
 		return str;
 
 	// Trim trailing space
 	end = str + strlen(str) - 1;
-	while (end > str && (isspace((unsigned char)*end)
-	                     || (unsigned char)*end == '"')) end--;
+	while (end > str && (unsigned char)*end == '"') end--;
 
 	end[1] = '\0';
 
 	return str;
 }
 
+char *trim_whitespace(char *str)
+{
+	char *end;
+	// Trim leading space
+	while (isspace((unsigned char)*str)) str++;
+
+	if (*str == 0) // All spaces?
+		return str;
+
+	// Trim trailing space
+	end = str + strlen(str) - 1;
+	while (end > str && isspace((unsigned char)*end)) end--;
+
+	end[1] = '\0';
+
+	return str;
+}
 bool surrounded_by(char* str, char c)
 {
 	return str[0] == c || str[strlen(str) - 1] == c;
@@ -137,11 +152,12 @@ int main(int argc, char** argv)
 		num_lines++;
 		while ((token = strsep(&tmp, ",")) != NULL) {
 			num_cols++;
-			char* old_token = strdup(token);
-			token = trim(token);
-			if (num_lines == 1 && strlen(old_token) > 0 && !is_empty(old_token)) {
-				if (surrounded_by(old_token, '"'))
+			token = trim_whitespace(token);
+			if (num_lines == 1 && strlen(token) > 0 && !is_empty(token)) {
+				if (surrounded_by(token, '"'))
 					quotes[num_cols] = true;
+
+				token = trim_quotes(token);
 
 				if (header_exists(headers, token, unique_header_count))
 					die("Invalid Duplicate Header");
@@ -155,10 +171,11 @@ int main(int argc, char** argv)
 			} else if (num_lines > 1 && tweeter_col == -1)
 				die("Header not found: `name`");
 			else if (!is_empty(token)) {
-				if ((quotes[num_cols] && not_surrounded_by(old_token, '"'))
-				    || (!quotes[num_cols] && surrounded_by(old_token, '"')))
+				if ((quotes[num_cols] && not_surrounded_by(token, '"'))
+				    || (!quotes[num_cols] && surrounded_by(token, '"')))
 					die("Inconsistent quotes");
 				if (num_cols == tweeter_col) {
+					token = trim_quotes(token);
 					int tweet_index = find_index(tweets, token, tw_count);
 					if (tweet_index == -1) {
 						tweets[tw_count].tweeter = token;
